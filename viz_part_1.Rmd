@@ -8,7 +8,14 @@ output: github_document
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(ggridges)
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = 0.4,
+  out.width = "90%"
+)
 ```
+
 
 ## viz
 
@@ -23,7 +30,7 @@ weather_df =
     name = recode(
       id, 
       USW00094728 = "CentralPark_NY", 
-      USC00519397 = "Molokai_HI",
+      USW00022534 = "Molokai_HI",
       USS0023B17S = "Waterhole_WA"),
     tmin = tmin / 10,
     tmax = tmax / 10) |>
@@ -70,5 +77,64 @@ try assigning a specific color
 weather_df |> 
   filter(name == "CentralPark_NY") |> 
   ggplot(aes(x = tmin, y = tmax))+ geom_point(color = "red")
+```
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) + geom_hex()
+```
+
+## univariate plotting
+
+histogram
+
+```{r}
+ggplot(weather_df, aes(x = tmax, fill = name))+
+  geom_histogram(position = "dodge")
+```
+let's use a density plot
+
+```{r}
+ggplot(weather_df, aes(x = tmax, fill = name))+
+  geom_density(alpha = .3, adjust = 2)
+```
+using a boxplots:
+
+```{r}
+ggplot(weather_df, aes(y = tmax,x = name))+ geom_boxplot()
+```
+violin plots:
+
+```{r}
+ggplot(weather_df, aes(y = tmax,x = name))+
+  geom_violin()
+```
+
+ridge plot:
+
+```{r}
+ggplot(weather_df, aes(x = tmax, y = name))+ geom_density_ridges()
+```
+```{r}
+weather_df |> 
+  filter(name == "Molokai_HI") |> 
+  ggplot(aes(x= date, y =tmax))+
+  geom_line(alpha= .5)+
+  geom_point(size = .5)
+```
+
+## saving and embedding plots
+
+```{r}
+ggp_weather = 
+  weather_df |> 
+  ggplot(aes(x = tmin, y = tmax))+ geom_point(size = .5)
+
+ggp_weather
+
+ggsave("results/ggp_weather.pdf", ggp_weather)
+```
+```{r, fig.width = 6, fig.asp= .6}
+ggp_weather
 ```
 
