@@ -1,0 +1,74 @@
+---
+title: "Viz part 1"
+author: "kindle zhang"
+date: "2023-09-28"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(ggridges)
+```
+
+## viz
+
+```{r}
+weather_df = 
+  rnoaa::meteo_pull_monitors(
+    c("USW00094728", "USW00022534", "USS0023B17S"),
+    var = c("PRCP", "TMIN", "TMAX"), 
+    date_min = "2021-01-01",
+    date_max = "2022-12-31") |>
+  mutate(
+    name = recode(
+      id, 
+      USW00094728 = "CentralPark_NY", 
+      USC00519397 = "Molokai_HI",
+      USS0023B17S = "Waterhole_WA"),
+    tmin = tmin / 10,
+    tmax = tmax / 10) |>
+  select(name, id, everything())
+```
+Let's make a plot
+
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax))+ geom_point(alpha = .7, size = .5, color = "red")
+```
+pipes and stuff
+
+```{r}
+ggp_nyc_weather = 
+  weather_df |> 
+  filter(name == "CentralPark_NY") |> 
+  ggplot(aes(x = tmin, y = tmax))+ geom_point(color = "red")
+
+```
+## Fancy plot
+
+
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax, color = name))+ geom_point() + geom_smooth()
+# or u can also use 
+# ggplot(weather_df, aes(x = tmin, y = tmax)) + geom_point(aes(color = name)) + geom_smooth()
+```
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax)) + geom_point(aes(color = name),alpha = 0.3) + geom_smooth(se = FALSE)
+```
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax, color = name)) + geom_point(alpha = .3) + geom_smooth() +facet_grid(.~name)
+# or u can use name~.
+```
+
+Let's try a different plot.temps are boring
+
+```{r}
+ggplot(weather_df, aes(x = date, y = tmax, color = name)) + geom_point(aes(size = prcp), alpha = .3)+ geom_smooth() + facet_grid(.~name)
+```
+try assigning a specific color
+
+```{r}
+weather_df |> 
+  filter(name == "CentralPark_NY") |> 
+  ggplot(aes(x = tmin, y = tmax))+ geom_point(color = "red")
+```
+
